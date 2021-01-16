@@ -5,7 +5,7 @@ using System.Text;
 namespace JeuDomino
 {
     /// <summary>
-    /// La classe qui représente un Domino 
+    /// La classe qui représente un Domino .
     /// </summary>
     public class Domino
     {
