@@ -5,33 +5,33 @@ using System.Text;
 namespace JeuDomino
 {
     /// <summary>
-    /// Un Paquet de dominos
+    /// Un Paquet de dominos.
     /// </summary>
     public class Paquet
     {
         ///
         /// <summary>
-        /// Le nombre d'itérations pour mélanger
+        /// Le nombre d'itérations pour mélanger.
         /// </summary>
         private const int ITERATION_MELANGE = 30;
         
         /// <summary>
-        /// Le calcul qui mene a 28 dominos... permet de changer MAX_VALUE et d'avoir un jeu complet
+        /// Le calcul qui mene a 28 dominos... permet de changer MAX_VALUE et d'avoir un jeu complet.
         /// </summary>
         public const int NOMBRE_DOMINOS = (Domino.MAX_VALUE+1)* (Domino.MAX_VALUE + 2)/2;
         
         /// <summary>
-        /// Le tableau de tous les dominos qui va etre melangé dans le constructeur
+        /// Le tableau de tous les dominos qui va etre melangé dans le constructeur.
         /// </summary>
         private Domino[] dominos;
 
         /// <summary>
-        /// Le tableau de tous les dominos qui va etre melangé das le constructeur
+        /// Le tableau de tous les dominos qui va etre melangé das le constructeur.
         /// <summary>
         public Domino[] Dominos { get { return dominos; } set { dominos = value; } }
 
         /// <summary>
-        /// L'indice du preier domino disponible, pas encore distribué...
+        /// L'indice du premier domino disponible, pas encore distribué...
         /// </summary>
         private int SommetPile;
 
