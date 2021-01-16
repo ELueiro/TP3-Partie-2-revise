@@ -8,20 +8,153 @@ namespace JeuDomino
     /// Classe qui modélise le jeu
     /// </summary>
     public class Jeu
-    {        
-        private List<Domino> tableJeu;
-        bool pas = false;
-
-        string message = "";
-        int turnJoueur;
+    {  
+        ///<summary>
+        ///la constante de nombre de joueurs
+        ///<summary>
+        private const int NOMBRE_JOUEURS = 4;
         
-        //domino pour garde la valeur des droit et gauche dans la table. Pour savoir si le jouer à un domino adjacent à lui
+        /// <summary>
+        /// Peut on diviser par 4 le nombre total de domino? -oui , c'est une nouvelle constante lequelle 
+        /// </summary>
+        private const int NOMBRE_DOMINOS = Paquet.NOMBRE_DOMINOS / NOMBRE_JOUEURS;
+        
+        ///<summary>
+        ///liste tableau de jeu
+        ///<summary>
+        private List<Domino> tableJeu;
+        
+        ///<summary>
+        ///des champs qu'on utilise dans la classe
+        ///<summary>
+        private bool pas = false;
+        private string message = "";
+        private int turnJoueur;
+        
+        ///<summary>
+        ///domino pour garde la valeur des droit et gauche dans la table. Pour savoir si le jouer à un domino adjacent à lui
+        ///<summary>   
         private Domino point=new Domino(Domino.MAX_VALUE, Domino.MAX_VALUE);
+ 
+        /// <summary>
+        /// La liste de joueurs
+        /// </summary>
+        private Joueur[] joueurs;
 
+        /// <summary>
+        /// Le paquet de domino
+        /// </summary>
+        private Paquet paquet;
+
+        /// <summary>
+        /// La liste de joueurs
+        /// </summary>
+        public Joueur[] Joueurs { get => joueurs; set => joueurs = value; }
+       
+        /// <summary>
+        /// Le constructeur du jeu qui crée un paquet et un tableau de 4 joueurs
+        /// </summary>
+        public Jeu()
+        {
+            paquet = new Paquet();
+            Joueurs = new Joueur[NOMBRE_JOUEURS];
+
+            for (int j = 0; j < NOMBRE_JOUEURS; j++)
+            {
+                Joueurs[j] = new Joueur($"Joueur {j + 1}");
+            }
+
+        }
+           
+
+        /// <summary>
+        /// Jouer qui distribue 7 dominos à chaque joueur et les organise par valeur
+        /// et affiche et commence la différent jeu
+        /// </summary>
+        public void Jouer()
+        {
+            ///<summary>
+            ///des champs qu'on utilise dans ce méthode
+            ///<summary>
+            private int bonus = 10;
+            private bool finiJeu;
+            
+            ///<summary>
+            ///Liste pour garde les dominos sur la table
+            ///<summary>
+            tableJeu = new List<Domino>();
+            
+            for (int i = 0; i < NOMBRE_JOUEURS; i++)
+            {
+                Joueurs[i].Jeu = paquet.Distribue(NOMBRE_DOMINOS);
+                Joueurs[i].Jeu = TrierTableau(Joueurs[i].Jeu);
+            }
+            
+            for (int i = 0; i < NOMBRE_JOUEURS; i++)
+            {
+                Console.WriteLine($"{Joueurs[i]} valeur: {Joueurs[i].Valeur()}");
+            }
+
+                      
+            finiJeu = false;
+
+            for (int i = 0; ; i++)
+            {
+                int count = 0;
+                message = "";
+
+                //on trouve  le joueur qui débutera la partie est deplace lui a la position 0 dans la tableau de joueurs
+                if (i == 0)
+                {
+                    PremierTurn();
+                }
+
+                for (int j = turnJoueur; j < NOMBRE_JOUEURS; j++)
+                {                    
+                    if (!pas)
+                    {
+                        ContinuationTurn();
+                    }
+
+                    //si le joueur n’a pas de domino sur les mains , il est gagnant
+                    if (Joueurs[j].Jeu.Count == 0)
+                    {
+                        message = $"{Joueurs[j].NomJoueur} est gagnant(e)!!!";
+                        Joueurs[j].Score += bonus;
+                        finiJeu = true;
+                        break;
+                    }
+                   
+                    if (!pas) 
+                    {
+                         count++;
+                        Console.WriteLine($"-> Joueur {Joueurs[j].NomJoueur} a passé son tour, count: {count} ");
+
+                        //Les 4 joueurs ont dû passer leur tour
+                        if (count == NOMBRE_JOUEURS)
+                        {
+                            Console.WriteLine($"Les 4 joueurs ont dû passer leur tour!!!");
+                            finiJeu = true;
+                        }                        
+                    }
+                    pas = false;
+                }
+                if (turnJoueur == 4)
+                {
+                    turnJoueur = 0;
+                }
+                if (finiJeu)
+                {
+                    AffichageValeurJou();
+                    break;
+                } 
+            }
+        }
+        
         /// <summary>
         /// Boucle pour trouver le premier joueur(lui qui a le double six) avec l'utilisation de la méthode Double Six.
         /// </summary>
-        public void PremierTurn()
+        private void PremierTurn()
         {
            
             for (int i = 0; i < NOMBRE_JOUEURS; i++)
@@ -45,7 +178,7 @@ namespace JeuDomino
         /// <summary>
         /// Continuation du jeu, tester si le prochain joueur a un domino pour jouer, l'utilisation de la méthode Avoir Domino.
         /// </summary>
-        public void ContinuationTurn()
+        private void ContinuationTurn()
          {
             //Si on arrive au dernier joueur on turne a le premier
             if (turnJoueur == 4)
@@ -88,52 +221,13 @@ namespace JeuDomino
             //passez au prochain joueur
             turnJoueur++;
         }
-       
-        private const int NOMBRE_JOUEURS = 4;
-
-        /// <summary>
-        /// Peut on diviser par 4 le nombre total de domino ici?
-        /// </summary>
-        private const int NOMBRE_DOMINOS = Paquet.NOMBRE_DOMINOS / NOMBRE_JOUEURS;
-
-        /// <summary>
-        /// La liste de joueurs
-        /// </summary>
-        private Joueur[] joueurs;
-
-        /// <summary>
-        /// Le paquet de domino
-        /// </summary>
-        private Paquet paquet;
-
-        /// <summary>
-        /// La liste de joueurs
-        /// </summary>
-        public Joueur[] Joueurs { get => joueurs; set => joueurs = value; }
-       
-
-        /// <summary>
-        /// Le constructeur du jeu qui crée un paquet et un tableau de 4 joueurs
-        /// 
-        /// </summary>
-        public Jeu()
-        {
-            paquet = new Paquet();
-            Joueurs = new Joueur[NOMBRE_JOUEURS];
-
-            for (int j = 0; j < NOMBRE_JOUEURS; j++)
-            {
-                Joueurs[j] = new Joueur($"Joueur {j + 1}");
-            }
-
-        }
-       
+        
         /// <summary>
         /// méthode qui organise les dominos par ordre de valeur, permet à l’ordinateur de jouer le domino le plus grand.
         /// </summary>
         /// <param name="test"></param>
         /// <returns>list de dominos organise pour valeur</returns>
-        public List<Domino> TrierTableau(List<Domino> test)
+        private List<Domino> TrierTableau(List<Domino> test)
         {
             int n = test.Count;
             int valeurMax=0;
@@ -156,89 +250,7 @@ namespace JeuDomino
             }
             return trie;
         }
-
-        /// <summary>
-        /// Jouer qui distribue 7 dominos à chaque joueur et les organise par valeur
-        /// et affiche et commence la différent jeu
-        /// </summary>
-        public void Jouer()
-        {
-            //************************************
-            int bonus = 10;
-            bool finiJeu;
-            //************************************
-            
-            //Liste pour garde les dominos sur la table
-            tableJeu = new List<Domino>();
-            
-            for (int i = 0; i < NOMBRE_JOUEURS; i++)
-            {
-                Joueurs[i].Jeu = paquet.Distribue(NOMBRE_DOMINOS);
-                Joueurs[i].Jeu = TrierTableau(Joueurs[i].Jeu);
-            }
-            
-            for (int i = 0; i < NOMBRE_JOUEURS; i++)
-            {
-                Console.WriteLine($"{Joueurs[i]} valeur: {Joueurs[i].Valeur()}");
-            }
-
-                      
-            finiJeu = false;
-
-            for (int i = 0; ; i++)
-            {
-                int count = 0;
-                message = "";
-
-                //on trouve  le joueur qui débutera la partie est deplace lui a la position 0 dans la tableau de joueurs
-                if (i == 0)
-                {
-                    PremierTurn();
-                }
-
-                for (int j = turnJoueur; j < NOMBRE_JOUEURS; j++)
-                {                    
-                    if (!pas)
-                    {
-                        ContinuationTurn();
-                    }
-
-                    //si le joueur n’a pas de domino est gagnant
-                    if (Joueurs[j].Jeu.Count == 0)
-                    {
-                        message = $"{Joueurs[j].NomJoueur} est gagnant(e)!!!";
-                        Joueurs[j].Score += bonus;
-                        finiJeu = true;
-                        break;
-                    }
-                   
-                    if (!pas) 
-                    {
-                         count++;
-                        Console.WriteLine($"-> Joueur {Joueurs[j].NomJoueur} a passé son tour, count: {count} ");
-
-                        //Les 4 joueurs ont dû passer leur tour
-                        if (count == NOMBRE_JOUEURS)
-                        {
-                            Console.WriteLine($"Les 4 joueurs ont dû passer leur tour!!!");
-                            finiJeu = true;
-                        }                        
-                    }
-                    pas = false;
-                }
-                if (turnJoueur == 4)
-                {
-                    turnJoueur = 0;
-                }
-                if (finiJeu)
-                {
-                    AffichageValeurJou();
-                    break;
-                } 
-            }
-        }
-
-
+        
         /// <summary>
         /// Affichage Jeu
         /// </summary>
